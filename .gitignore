@@ -3,3 +3,14 @@
 
 # Ignore Gradle build output directory
 build
+
+# Ignore package files
+*.ear
+*.war
+*.jar
+
+# IntelliJ IDEA
+.idea
+
+# Don't ignore gradle wrapper
+!gradle/wrapper/gradle-wrapper.jar
