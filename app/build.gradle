@@ -9,7 +9,7 @@ sourceCompatibility = 16
 targetCompatibility = 16
 
 group 'com.codelog'
-version '0.0.1-ALPHA'
+version '0.0.1-BETA'
 
 repositories {
     mavenCentral()
@@ -48,4 +48,24 @@ application {
 
 compileKotlin {
     kotlinOptions.jvmTarget = '16'
+}
+
+shadowJar {
+    mainClassName = 'com.codelog.rkimer.App'
+
+}
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'com.codelog.rkimer.AppKt'
+    }
+    archiveClassifier.set("all")
+    from {
+        resources.collect()
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        configurations.runtimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    with jar
 }
