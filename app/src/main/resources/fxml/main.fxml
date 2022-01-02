@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="543.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codelog.rkimer.controller.MainController">
+   <top>
+      <MenuBar>
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="mnuSave" mnemonicParsing="false" onAction="#mnuSaveClick" text="Save times">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator></MenuItem>
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Solve">
+            <items>
+                  <CheckMenuItem fx:id="mnuDNF" mnemonicParsing="false" onAction="#mnuDNFClick" text="DNF">
+                      <accelerator>
+                          <KeyCodeCombination alt="UP" code="D" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                      </accelerator>
+                  </CheckMenuItem>
+                  <CheckMenuItem fx:id="mnuPlusTwo" mnemonicParsing="false" onAction="#mnuPlusTwoClick" text="+2">
+                      <accelerator>
+                          <KeyCodeCombination alt="UP" code="P" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                      </accelerator>
+                  </CheckMenuItem>
+                  <MenuItem fx:id="mnuDelete" mnemonicParsing="false" onAction="#mnuDeleteClick" text="Discard Solve">
+                      <accelerator>
+                          <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP" />
+                      </accelerator>
+                  </MenuItem>
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <Label fx:id="lblTimer" text="00:00" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="48.0" />
+         </font>
+      </Label>
+   </center>
+   <left>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextArea fx:id="txtStats" focusTraversable="false" minWidth="200.0" prefHeight="200.0" prefWidth="400.0" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="lstSolves" focusTraversable="false" prefHeight="200.0" prefWidth="200.0" />
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
+   </right>
+   <bottom>
+      <Label fx:id="lblScramble" BorderPane.alignment="TOP_CENTER">
+         <font>
+            <Font size="24.0" />
+         </font>
+         <padding>
+            <Insets bottom="20.0" />
+         </padding>
+      </Label>
+   </bottom>
+</BorderPane>

@@ -12,5 +12,8 @@ build
 # IntelliJ IDEA
 .idea
 
+# Ignore generated JSON files
+*.json
+
 # Don't ignore gradle wrapper
 !gradle/wrapper/gradle-wrapper.jar
