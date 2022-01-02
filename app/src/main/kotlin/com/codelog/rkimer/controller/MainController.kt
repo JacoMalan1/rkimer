@@ -155,6 +155,9 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         solves.addAll(lstSolves.items)
         solves.removeIf { it.dnf }
 
+        if (solves.size == 0)
+            return
+
         var best = solves[0]
         for (solve in solves) {
             if (solve.actualTime() < best.actualTime())
@@ -193,8 +196,13 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
         val builder = StringBuilder()
         val bestStr = timeToStr(best.actualTime())
-        val mo3Str = timeToStr(mo3)
-        val ao5Str = timeToStr(ao5)
+        var mo3Str = timeToStr(mo3)
+        var ao5Str = timeToStr(ao5)
+
+        if (mo3 == -1)
+            mo3Str = "N/A"
+        if (ao5 == -1)
+            ao5Str = "N/A"
 
         builder.append("Best: $bestStr\n")
         builder.append("Mean of 3: $mo3Str\n")

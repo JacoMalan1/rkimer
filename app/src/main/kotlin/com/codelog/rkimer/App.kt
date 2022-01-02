@@ -9,13 +9,12 @@ import javafx.stage.Stage
 import java.net.URL
 import kotlin.system.exitProcess
 
+fun main(args: Array<String>) {
+    App().launchApp(args)
+}
+
 class App: Application() {
     companion object {
-        @JvmStatic
-        fun main(args: Array<String>) {
-            App().launchApp(args)
-        }
-
         var currentScene: Scene? = null
         var currentStage: Stage? = null
     }
