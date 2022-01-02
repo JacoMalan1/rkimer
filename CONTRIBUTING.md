@@ -13,7 +13,8 @@ Please note we have a code of conduct, please follow it in all your interactions
    code or necessary to build a working executable from the source tree.
 3. Increase the version number in any relevant files to represent the version this PR would be. 
    The versioning scheme we use is [SemVer](http://semver.org/).
-4. All Kotlin code must conform to the [Kotlin style guide](https://developer.android.com/kotlin/style-guide)
+4. Update CHANGELOG.md with any changes made. Refer to previous entries for the format.
+5. All Kotlin code must conform to the [Kotlin style guide](https://developer.android.com/kotlin/style-guide)
    before submition of the pull request.
 
 ## Code of Conduct
