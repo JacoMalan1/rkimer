@@ -61,7 +61,7 @@ task fatJar(type: Jar) {
     }
     archiveBaseName = 'rkimer'
     archiveVersion = ''
-    archiveClassifier.set("all")
+    archiveClassifier.set("")
     from {
         resources.collect()
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
