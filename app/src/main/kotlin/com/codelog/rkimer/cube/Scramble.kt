@@ -49,8 +49,12 @@ class ScrambleFactory {
 
                 validMoves.clear()
                 for (move in Move.values()) {
-                    if (move.ordinal % 6 != selectedMove.ordinal % 6)
-                        validMoves.add(move)
+                    if (move.ordinal % 6 != selectedMove.ordinal % 6) {
+                        val invalidMove = if (selectedMove.ordinal % 2 == 0)
+                            selectedMove.ordinal + 1 else selectedMove.ordinal - 1
+                        if (move.ordinal % 6 != invalidMove % 6)
+                            validMoves.add(move)
+                    }
                 }
             }
 
