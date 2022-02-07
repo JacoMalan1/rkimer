@@ -5,6 +5,7 @@ import javafx.application.Application
 import javafx.fxml.FXMLLoader
 import javafx.scene.Parent
 import javafx.scene.Scene
+import javafx.scene.image.Image
 import javafx.stage.Stage
 import java.net.URL
 import kotlin.system.exitProcess
@@ -35,6 +36,7 @@ class App: Application() {
             scene.stylesheets.add(styleResource.toExternalForm())
         currentScene = scene
         primaryStage.scene = scene
+        primaryStage.icons.add(Image(javaClass.classLoader.getResourceAsStream("rkimer.ico")))
 
         primaryStage.title = "RKimer"
         primaryStage.isResizable = false

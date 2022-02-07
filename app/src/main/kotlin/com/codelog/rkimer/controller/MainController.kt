@@ -16,6 +16,8 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldListCell
+import javafx.scene.image.Image
+import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.stage.Stage
@@ -73,6 +75,8 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     lateinit var mnuDNF: CheckMenuItem
     @FXML
     lateinit var mnuPlusTwo: CheckMenuItem
+    @FXML
+    lateinit var imgScramble: ImageView
 
     lateinit var scramble: Scramble
 
@@ -144,6 +148,16 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
     private fun resetTimer() {
         scramble = ScrambleFactory.generateScramble(20)
+        var path = "http://cube.rider.biz/visualcube.png?&size=1024&pzl=3&sch=wrgyob&alg="
+        path += scramble.toString().replace(" ", "")
+        val img = Image(
+            path,
+            200.0, 200.0, false, true
+        )
+        if (img.isError)
+            System.err.println(img.exception)
+        imgScramble.image = img
+
         lblScramble.text = scramble.toString()
     }
 

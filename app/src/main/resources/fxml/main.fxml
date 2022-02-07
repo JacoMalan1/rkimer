@@ -8,12 +8,13 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="543.0" prefWidth="843.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codelog.rkimer.controller.MainController">
+<BorderPane prefHeight="659.0" prefWidth="1002.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.codelog.rkimer.controller.MainController">
    <top>
       <MenuBar>
         <menus>
@@ -71,9 +72,6 @@
          </children>
       </VBox>
    </left>
-   <right>
-      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER" />
-   </right>
    <bottom>
       <Label fx:id="lblScramble" BorderPane.alignment="TOP_CENTER">
          <font>
@@ -84,4 +82,7 @@
          </padding>
       </Label>
    </bottom>
+   <right>
+      <ImageView fx:id="imgScramble" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="TOP_RIGHT" />
+   </right>
 </BorderPane>
