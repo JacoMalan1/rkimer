@@ -6,3 +6,4 @@
 
  - Solves are now stored with their respective scramble.
  - Added a solve data viewer with a graph of solve time, average of 3 and personal best
+ - Added a scramble visualiser
