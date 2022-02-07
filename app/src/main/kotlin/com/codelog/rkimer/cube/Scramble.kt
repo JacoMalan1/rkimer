@@ -1,5 +1,6 @@
 package com.codelog.rkimer.cube
 
+import org.json.JSONArray
 import kotlin.random.Random
 
 enum class Move {
@@ -9,6 +10,16 @@ enum class Move {
 }
 
 data class Scramble(val moves: Array<Move>) {
+    companion object {
+        fun fromJSONArray(json: JSONArray): Scramble {
+            val moves: Array<Move> = Array(json.length()) { _ -> Move.R}
+            for (i in 0 until json.length()) {
+                moves[i] = Move.values()[json.getInt(i)]
+            }
+            return Scramble(moves)
+        }
+    }
+
     override fun toString(): String {
         val builder = StringBuilder()
         for (move in moves) {
@@ -28,6 +39,14 @@ data class Scramble(val moves: Array<Move>) {
         if (!moves.contentEquals(other.moves)) return false
 
         return true
+    }
+
+    fun toJSONArray(): JSONArray {
+        val json = JSONArray()
+        for (move in moves) {
+            json.put(move.ordinal)
+        }
+        return json
     }
 
     override fun hashCode(): Int {

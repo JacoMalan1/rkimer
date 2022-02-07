@@ -1,6 +1,7 @@
 package com.codelog.rkimer.controller
 
 import com.codelog.rkimer.App
+import com.codelog.rkimer.cube.Scramble
 import com.codelog.rkimer.cube.ScrambleFactory
 import com.codelog.rkimer.cube.Solve
 import com.codelog.rkimer.cube.timeToStr
@@ -9,13 +10,15 @@ import com.codelog.rkimer.util.ConfirmationDialogFactory
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
+import javafx.fxml.FXMLLoader
 import javafx.fxml.Initializable
+import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldListCell
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
-import javafx.scene.text.Font
+import javafx.stage.Stage
 import javafx.util.StringConverter
 import org.json.JSONArray
 import java.io.File
@@ -70,6 +73,8 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     lateinit var mnuDNF: CheckMenuItem
     @FXML
     lateinit var mnuPlusTwo: CheckMenuItem
+
+    lateinit var scramble: Scramble
 
     override fun initialize(location: URL?, resources: ResourceBundle?) {
         mnuDNF.isDisable = true
@@ -138,11 +143,12 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun resetTimer() {
-        lblScramble.text = ScrambleFactory.generateScramble(20).toString()
+        scramble = ScrambleFactory.generateScramble(20)
+        lblScramble.text = scramble.toString()
     }
 
     private fun registerSolve() {
-        lstSolves.items.add(0, Solve(time, dnf = false, plusTwo = false))
+        lstSolves.items.add(0, Solve(time, dnf = false, plusTwo = false, scramble = scramble))
         isSaved = false
         calculateStatistics()
     }
@@ -293,5 +299,19 @@ class MainController: Initializable, EventHandler<KeyEvent> {
                 }
             }
         }
+    }
+
+    fun mnuSolveDataClick() {
+        val file: URL = javaClass.classLoader.getResource("fxml/solveData.fxml") ?: exitProcess(-1)
+        val root: Parent = FXMLLoader.load(file)
+        val scene = Scene(root)
+        val stage = Stage()
+        stage.title = "Solve Data Viewer"
+        stage.scene = scene
+
+        SolveDataController.instance?.solves = ArrayList(lstSolves.items)
+        SolveDataController.instance?.addSolves()
+
+        stage.showAndWait()
     }
 }

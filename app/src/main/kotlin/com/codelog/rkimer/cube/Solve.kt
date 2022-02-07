@@ -16,7 +16,7 @@ fun timeToStr(time: Int): String {
     return "$minutesStr:$secondsStr.$millisStr"
 }
 
-data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean) {
+data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scramble: Scramble? = null) {
     companion object {
         fun fromJSONObject(json: JSONObject): Solve {
             if (!json.has("time") || !json.has("dnf") || !json.has("plusTwo"))
@@ -26,7 +26,12 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean) {
             val dnf = json.getBoolean("dnf")
             val plusTwo = json.getBoolean("plusTwo")
 
-            return Solve(time, dnf, plusTwo)
+            var scramble: Scramble? = null
+            if (json.has("scramble")) {
+                scramble = Scramble.fromJSONArray(json.getJSONArray("scramble"))
+            }
+
+            return Solve(time, dnf, plusTwo, scramble)
         }
     }
 
@@ -42,6 +47,9 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean) {
         result.put("time", time)
         result.put("dnf", dnf)
         result.put("plusTwo", plusTwo)
+
+        if (scramble != null)
+            result.put("scramble", scramble.toJSONArray())
 
         return result
     }

@@ -25,6 +25,15 @@
                      </accelerator></MenuItem>
             </items>
           </Menu>
+            <Menu mnemonicParsing="false" text="View">
+              <items>
+                <MenuItem mnemonicParsing="false" onAction="#mnuSolveDataClick" text="Solve Data">
+                    <accelerator>
+                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                    </accelerator>
+                </MenuItem>
+              </items>
+            </Menu>
           <Menu mnemonicParsing="false" text="Solve">
             <items>
                   <CheckMenuItem fx:id="mnuDNF" mnemonicParsing="false" onAction="#mnuDNFClick" text="DNF">
