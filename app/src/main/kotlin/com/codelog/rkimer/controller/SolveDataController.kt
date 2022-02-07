@@ -5,25 +5,15 @@ import com.codelog.rkimer.cube.Scramble
 import com.codelog.rkimer.cube.Solve
 import com.codelog.rkimer.cube.timeToStr
 import javafx.application.Platform
-import javafx.beans.InvalidationListener
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.value.ChangeListener
-import javafx.beans.value.ObservableBooleanValue
-import javafx.beans.value.ObservableValue
-import javafx.collections.FXCollections
-import javafx.collections.ObservableList
 import javafx.fxml.FXML
 import javafx.fxml.Initializable
-import javafx.scene.chart.CategoryAxis
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.chart.XYChart
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
-import javafx.scene.control.cell.CheckBoxTableCell
 import javafx.scene.control.cell.PropertyValueFactory
 import javafx.scene.control.cell.TextFieldTableCell
-import javafx.util.Callback
 import javafx.util.StringConverter
 import java.net.URL
 import java.util.*
@@ -86,7 +76,7 @@ class SolveDataController: Initializable {
         chtSolves.verticalGridLinesVisible = false
 
         val data = ArrayList<Solve>(solves.size)
-        for (s in solves) {
+        for (s in solves.reversed()) {
             if (!s.dnf)
                 data.add(s)
         }
