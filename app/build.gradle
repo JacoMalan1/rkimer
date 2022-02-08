@@ -60,6 +60,10 @@ compileKotlin {
     kotlinOptions.jvmTarget = '16'
 }
 
+compileTestKotlin {
+    kotlinOptions.jvmTarget = '16'
+}
+
 shadowJar {
     mainClassName = 'com.codelog.rkimer.App'
 
