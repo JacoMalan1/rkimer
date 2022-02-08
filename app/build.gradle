@@ -13,6 +13,13 @@ version '0.0.2-BETA'
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://maven.pkg.github.com/Code-Log/clogg-java")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+        }
+    }
 }
 
 javafx {
@@ -29,6 +36,9 @@ dependencies {
 
     // JSON
     implementation 'org.json:json:20211205'
+
+    // CLogg
+    implementation 'com.codelog:clogg:1.0.1'
 }
 
 application {
