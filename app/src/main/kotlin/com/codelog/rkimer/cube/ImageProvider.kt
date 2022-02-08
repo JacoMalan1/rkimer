@@ -1,4 +1,7 @@
 package com.codelog.rkimer.cube
 
-class ImageProvider {
+import javafx.scene.image.Image
+
+interface ImageProvider {
+    fun provide(): Image
 }

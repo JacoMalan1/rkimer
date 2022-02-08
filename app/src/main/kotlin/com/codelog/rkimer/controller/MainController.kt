@@ -1,10 +1,7 @@
 package com.codelog.rkimer.controller
 
 import com.codelog.rkimer.App
-import com.codelog.rkimer.cube.Scramble
-import com.codelog.rkimer.cube.ScrambleFactory
-import com.codelog.rkimer.cube.Solve
-import com.codelog.rkimer.cube.timeToStr
+import com.codelog.rkimer.cube.*
 import com.codelog.rkimer.util.AlertFactory
 import com.codelog.rkimer.util.ConfirmationDialogFactory
 import javafx.application.Platform
@@ -148,15 +145,8 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
     private fun resetTimer() {
         scramble = ScrambleFactory.generateScramble(20)
-        var path = "http://cube.rider.biz/visualcube.png?&size=1024&pzl=3&sch=wrgyob&alg="
-        path += scramble.toString().replace(" ", "")
-        val img = Image(
-            path,
-            200.0, 200.0, false, true
-        )
-        if (img.isError)
-            System.err.println(img.exception)
-        imgScramble.image = img
+        val imgProvider: ImageProvider = ScrambleImageProvider(scramble, 250.0, 250.0)
+        imgScramble.image = imgProvider.provide()
 
         lblScramble.text = scramble.toString()
     }
