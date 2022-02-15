@@ -10,7 +10,7 @@ class ScrambleImageProvider(val scramble: Scramble, private val width: Double, p
     override fun provide(): Image {
         val scrambleStr = scramble.toString().replace(" ", "")
         val img = Image(
-            Reference.SCRAMBLE_IMAGE_WEBSITE + scrambleStr,
+            Reference.SCRAMBLE_IMAGE_URL + scrambleStr,
             width, height,
             false, smooth, backgroundLoading
         )
