@@ -9,7 +9,7 @@ enum class Move {
     R2, L2, U2, D2, B2, F2
 }
 
-data class Scramble(val moves: Array<Move>) {
+data class Scramble(val moves: Array<Move>, val cubeType: CubeType = CubeType.c33) {
     companion object {
         fun fromJSONArray(json: JSONArray): Scramble {
             val moves: Array<Move> = Array(json.length()) { _ -> Move.R}
@@ -56,7 +56,7 @@ data class Scramble(val moves: Array<Move>) {
 
 class ScrambleFactory {
     companion object {
-        fun generateScramble(length: Int): Scramble {
+        fun generateScramble(length: Int, cubeType: CubeType): Scramble {
             val moves = Array(length) { _ -> Move.R }
             val rand = Random(System.nanoTime())
 

@@ -13,7 +13,6 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldListCell
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
@@ -144,7 +143,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun resetTimer() {
-        scramble = ScrambleFactory.generateScramble(20)
+        scramble = ScrambleFactory.generateScramble(20, CubeType.c33)
         val imgProvider: ImageProvider = ScrambleImageProvider(scramble, 250.0, 250.0)
         imgScramble.image = imgProvider.provide()
 
@@ -223,6 +222,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
     private fun toggleTimer() {
         if (!isTimerRunning) {
+            lblTimer.style = "-fx-font-family:'DSEG7 Modern';-fx-text-fill: green;"
             instance?.timer = Timer()
             instance?.time = 0
             instance?.timer?.scheduleAtFixedRate(object : TimerTask() {
@@ -236,6 +236,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         } else {
             instance?.timer?.cancel()
             isTimerRunning = false
+            lblTimer.style = "-fx-font-family:'DSEG7 Modern';-fx-text-fill: black;"
             resetTimer()
             registerSolve()
         }
