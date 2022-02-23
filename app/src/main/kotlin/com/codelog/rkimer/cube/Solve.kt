@@ -16,7 +16,9 @@ fun timeToStr(time: Int): String {
     return "$minutesStr:$secondsStr.$millisStr"
 }
 
-data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scramble: Scramble? = null) {
+data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scramble: Scramble? = null,
+                 val cubeType: CubeType = CubeType.c33) {
+
     companion object {
         fun fromJSONObject(json: JSONObject): Solve {
             if (!json.has("time") || !json.has("dnf") || !json.has("plusTwo"))
@@ -27,11 +29,14 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scra
             val plusTwo = json.getBoolean("plusTwo")
 
             var scramble: Scramble? = null
-            if (json.has("scramble")) {
+            if (json.has("scramble"))
                 scramble = Scramble.fromJSONArray(json.getJSONArray("scramble"))
-            }
 
-            return Solve(time, dnf, plusTwo, scramble)
+            var cubeType: CubeType? = null
+            if (json.has("cubeType"))
+                cubeType = CubeType.values()[json.getInt("cubeType")]
+
+            return Solve(time, dnf, plusTwo, scramble, cubeType ?: CubeType.c33)
         }
     }
 
@@ -47,6 +52,7 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scra
         result.put("time", time)
         result.put("dnf", dnf)
         result.put("plusTwo", plusTwo)
+        result.put("cubeType", cubeType.ordinal)
 
         if (scramble != null)
             result.put("scramble", scramble.toJSONArray())

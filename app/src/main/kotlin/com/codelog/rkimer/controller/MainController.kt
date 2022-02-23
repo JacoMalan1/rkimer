@@ -18,8 +18,6 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import org.json.JSONArray
-import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.util.*
@@ -29,6 +27,7 @@ import kotlin.system.exitProcess
 class MainController: Initializable, EventHandler<KeyEvent> {
     private var timer: Timer = Timer()
     private var time: Int = 0
+    private var cubeType = CubeType.c33
 
     companion object {
         var instance: MainController? = null
@@ -105,36 +104,34 @@ class MainController: Initializable, EventHandler<KeyEvent> {
             }
         }
 
-        loadSolves("solves.json")
+        val converted = SolveContext.loadSolves("solves.json")
+
+        loadSolves()
+
+        if (converted) {
+            AlertFactory.showAndWait("Your saved times have been converted from an old format (pre v0.1.0-BETA). " +
+                    "Should anything have gone wrong, please contact the developer. " +
+                    "Your old solves have been backed up as 'solves_backup.json'")
+            saveSolves()
+        }
+
+        isSaved = true
 
         lblTimer.text = "00:00.00"
         lblTimer.style = "-fx-font-family:'DSEG7 Modern'"
         txtStats.isDisable = true
         resetTimer()
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
         instance = this
     }
 
-    private fun loadSolves(filePath: String) {
-        val solves = ArrayList<Solve>()
-        val file = File(filePath)
-        if (file.exists()) {
-            val contents = file.readText()
-            val jsonArray = JSONArray(contents)
-            for (i in 0 until jsonArray.length()) {
-                val solve = Solve.fromJSONObject(jsonArray.getJSONObject(i))
-                solves.add(solve)
-            }
+    private fun loadSolves() {
+        if (lstSolves.items.size > 0)
+            SolveContext[cubeType] = ArrayList(lstSolves.items)
 
-            mnuPlusTwo.isSelected = solves.last().plusTwo
-            mnuDNF.isSelected = solves.last().dnf
-
-            lstSolves.items.addAll(solves)
-            if (lstSolves.items.size > 0)
-                lstSolves.selectionModel.select(0)
-        }
-
-        isSaved = true
+        lstSolves.items.addAll(SolveContext[cubeType])
+        if (lstSolves.items.size > 0)
+            lstSolves.selectionModel.select(0)
     }
 
     fun tickTimer() {
@@ -153,15 +150,15 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     private fun registerSolve() {
         lstSolves.items.add(0, Solve(time, dnf = false, plusTwo = false, scramble = scramble))
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
-    private fun calculateStatistics() {
-        if (lstSolves.items.size == 0)
+    private fun calculateStatistics(solveList: List<Solve>) {
+        if (solveList.isEmpty())
             return
 
         val solves = ArrayList<Solve>()
-        solves.addAll(lstSolves.items)
+        solves.addAll(solveList)
         solves.removeIf { it.dnf }
 
         if (solves.size == 0)
@@ -253,7 +250,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         lstSolves.refresh()
         mnuPlusTwo.isDisable = mnuDNF.isSelected
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
     fun mnuPlusTwoClick() {
@@ -261,17 +258,12 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         lstSolves.refresh()
         mnuDNF.isDisable = mnuPlusTwo.isSelected
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
     private fun saveSolves() {
-        val solveArray = JSONArray()
-        for (solve in lstSolves.items)
-            solveArray.put(solve.serialize())
-        val file = File("solves.json")
-        if (file.exists())
-            file.delete()
-        file.writeText(solveArray.toString(4))
+        SolveContext[cubeType] = ArrayList(lstSolves.items)
+        SolveContext.writeSolves("solves.json")
         isSaved = true
     }
 
@@ -300,7 +292,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
                 if (result.get()) {
                     lstSolves.items.remove(lstSolves.selectionModel.selectedItem)
                     lstSolves.refresh()
-                    calculateStatistics()
+                    calculateStatistics(lstSolves.items)
                 }
             }
         }
