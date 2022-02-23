@@ -17,6 +17,8 @@ Please note we have a code of conduct, please follow it in all your interactions
 5. All Kotlin code must conform to the [Kotlin style guide](https://developer.android.com/kotlin/style-guide)
    before submition of the pull request.
 
+**Note:** Pull requests will only be considered for the `testing` branch.
+
 ## Code of Conduct
 
 ### Our Pledge
