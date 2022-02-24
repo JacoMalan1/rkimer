@@ -16,18 +16,25 @@ import javafx.scene.control.cell.TextFieldListCell
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.stage.FileChooser
+import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.util.StringConverter
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.IOException
 import java.net.URL
 import java.util.*
+import kotlin.math.floor
 import kotlin.math.round
 import kotlin.system.exitProcess
+import com.codelog.rkimer.util.KLoggerContext as Logger
 
 class MainController: Initializable, EventHandler<KeyEvent> {
+
     private var timer: Timer = Timer()
     private var time: Int = 0
-    private var cubeType = CubeType.c33
+    private var cubeType = CubeType.C33
 
     companion object {
         var instance: MainController? = null
@@ -72,6 +79,8 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     lateinit var mnuPlusTwo: CheckMenuItem
     @FXML
     lateinit var imgScramble: ImageView
+    @FXML
+    lateinit var tglCubeType: ToggleGroup
 
     lateinit var scramble: Scramble
 
@@ -106,7 +115,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
         val converted = SolveContext.loadSolves("solves.json")
 
-        loadSolves()
+        loadSolves(CubeType.C33)
 
         if (converted) {
             AlertFactory.showAndWait("Your saved times have been converted from an old format (pre v0.1.0-BETA). " +
@@ -117,6 +126,18 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
         isSaved = true
 
+        tglCubeType.selectedToggleProperty().addListener { _, oldValue, newValue ->
+            val idxNew = tglCubeType.toggles.indexOf(newValue)
+            val idxOld = tglCubeType.toggles.indexOf(oldValue)
+            cubeType = CubeType.values()[idxNew]
+            val cubeName = cubeType.cubeName()
+            App.currentStage?.title = "RKimer - $cubeName"
+
+            val oldCubeType = CubeType.values()[idxOld]
+            loadSolves(oldCubeType)
+            resetTimer()
+        }
+
         lblTimer.text = "00:00.00"
         lblTimer.style = "-fx-font-family:'DSEG7 Modern'"
         txtStats.isDisable = true
@@ -125,13 +146,16 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         instance = this
     }
 
-    private fun loadSolves() {
+    private fun loadSolves(oldCubeType: CubeType) {
         if (lstSolves.items.size > 0)
-            SolveContext[cubeType] = ArrayList(lstSolves.items)
+            SolveContext[oldCubeType] = ArrayList(lstSolves.items)
+
+        lstSolves.items.clear()
 
         lstSolves.items.addAll(SolveContext[cubeType])
         if (lstSolves.items.size > 0)
             lstSolves.selectionModel.select(0)
+        calculateStatistics(SolveContext[cubeType])
     }
 
     fun tickTimer() {
@@ -140,7 +164,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun resetTimer() {
-        scramble = ScrambleFactory.generateScramble(20, CubeType.c33)
+        scramble = ScrambleFactory.generateScramble(20, cubeType)
         val imgProvider: ImageProvider = ScrambleImageProvider(scramble, 250.0, 250.0)
         imgScramble.image = imgProvider.provide()
 
@@ -154,8 +178,14 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun calculateStatistics(solveList: List<Solve>) {
-        if (solveList.isEmpty())
+        if (solveList.isEmpty()) {
+            val builder = StringBuilder()
+            builder.append("Best: N/A\n")
+            builder.append("Mean of 3: N/A\n")
+            builder.append("Average of 5: N/A")
+            txtStats.text = builder.toString()
             return
+        }
 
         val solves = ArrayList<Solve>()
         solves.addAll(solveList)
@@ -243,6 +273,10 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         if (event.code == KeyCode.SPACE) {
             toggleTimer()
         }
+        if (event.code == KeyCode.RIGHT) {
+            val idx = tglCubeType.toggles.indexOf(tglCubeType.selectedToggle)
+            tglCubeType.toggles[(idx + 1) % tglCubeType.toggles.size].isSelected = true
+        }
     }
 
     fun mnuDNFClick() {
@@ -310,5 +344,48 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         SolveDataController.instance?.addSolves()
 
         stage.showAndWait()
+    }
+
+    fun mnuImportCsTimerClick() {
+        val stage = Stage()
+        stage.initOwner(App.currentStage)
+        stage.initModality(Modality.APPLICATION_MODAL)
+
+        val fileChooser = FileChooser()
+        fileChooser.title = "Open csTimer data"
+        val file = fileChooser.showOpenDialog(stage)
+
+        val contents = file.readText()
+        try {
+            val json = JSONObject(contents)
+            val solves = ArrayList<Solve>()
+            for (key in json.keySet()) {
+                if (key.contains("session")) {
+                    val jsonArray = json.getJSONArray(key)
+                    for (i in 0 until jsonArray.length()) {
+                        val jsonSolve = jsonArray.getJSONArray(i)
+                        val flag = jsonSolve.getJSONArray(0).getInt(0)
+                        var dnf = false
+                        var plusTwo = false
+                        if (flag == 2000)
+                            plusTwo = true
+                        else if (flag == -1)
+                            dnf = true
+
+                        val time = floor(jsonSolve.getJSONArray(0).getInt(1) / 10.toDouble()).toInt()
+                        val scrambleStr = jsonSolve.getString(1)
+                        val scramble = Scramble.fromString(scrambleStr)
+
+                        solves.add(Solve(time, dnf, plusTwo, scramble))
+                    }
+                }
+            }
+            lstSolves.items.addAll(0, solves)
+            isSaved = false
+        } catch (e: JSONException) {
+            Logger.error("Couldn't load file (${file.absolutePath})")
+            Logger.exception(e)
+            AlertFactory.showAlert("The file you selected does not contain valid JSON!", Alert.AlertType.ERROR)
+        }
     }
 }

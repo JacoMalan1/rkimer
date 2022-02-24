@@ -4,6 +4,10 @@ import org.json.JSONException
 import org.json.JSONObject
 import kotlin.math.truncate
 
+/**
+ * Returns a String representation of a delta-time
+ * @param time The time in centi-seconds (Hundredths of a second)
+ */
 fun timeToStr(time: Int): String {
     val millis = time % 100
     val seconds = truncate(time.toDouble() / 100.0).toInt() % 60
@@ -17,9 +21,12 @@ fun timeToStr(time: Int): String {
 }
 
 data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scramble: Scramble? = null,
-                 val cubeType: CubeType = CubeType.c33) {
+                 val cubeType: CubeType = CubeType.C33) {
 
     companion object {
+        /**
+         * Converts a JSON object into a Solve object
+         */
         fun fromJSONObject(json: JSONObject): Solve {
             if (!json.has("time") || !json.has("dnf") || !json.has("plusTwo"))
                 throw JSONException("Missing values")
@@ -36,16 +43,22 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scra
             if (json.has("cubeType"))
                 cubeType = CubeType.values()[json.getInt("cubeType")]
 
-            return Solve(time, dnf, plusTwo, scramble, cubeType ?: CubeType.c33)
+            return Solve(time, dnf, plusTwo, scramble, cubeType ?: CubeType.C33)
         }
     }
 
+    /**
+     * Returns the solve time (includes +2 flag)
+     */
     fun actualTime(): Int =
         if (plusTwo)
             time + 200
         else
             time
 
+    /**
+     * Returns a JSON representation of a Solve object
+     */
     fun serialize(): JSONObject {
         val result = JSONObject()
 
@@ -60,6 +73,9 @@ data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scra
         return result
     }
 
+    /**
+     * Returns a String representing a Solve Object
+     */
     override fun toString(): String {
         var actualTime = time
         if (plusTwo)

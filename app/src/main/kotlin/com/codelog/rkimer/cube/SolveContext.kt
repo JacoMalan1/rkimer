@@ -5,14 +5,21 @@ import org.json.JSONObject
 import java.io.File
 import java.util.*
 
+/**
+ * This object stores the current list of solves for every CubeType respectively
+ */
 object SolveContext {
-    private var solves: MutableMap<CubeType, List<Solve>> = EnumMap(CubeType.c33.javaClass)
+    private var solves: MutableMap<CubeType, MutableList<Solve>> = EnumMap(CubeType.C33.javaClass)
 
-    operator fun get(cubeType: CubeType): List<Solve> = solves[cubeType] ?: ArrayList()
-    operator fun set(cubeType: CubeType, solveList: List<Solve>) {
+    operator fun get(cubeType: CubeType): MutableList<Solve> = solves[cubeType] ?: ArrayList()
+    operator fun set(cubeType: CubeType, solveList: MutableList<Solve>) {
         solves[cubeType] = solveList
     }
 
+    /**
+     * Populates the solves member variable with the data from
+     * a JSON file containing solve data.
+     */
     fun loadSolves(fileName: String): Boolean {
         val file = File(fileName)
         if (!file.exists())
@@ -25,7 +32,7 @@ object SolveContext {
             val solveList = ArrayList<Solve>()
             for (i in 0 until jsonArray.length())
                 solveList.add(Solve.fromJSONObject(jsonArray.getJSONObject(i)))
-            solves[CubeType.c33] = solveList
+            solves[CubeType.C33] = solveList
             return true
         } else {
             val json = JSONObject(contents)
@@ -46,6 +53,10 @@ object SolveContext {
         }
     }
 
+    /**
+     * Writes the current SolveContext state to a JSON file.
+     * @param fileName The exact file path to write the data to.
+     */
     fun writeSolves(fileName: String) {
         val file = File(fileName)
         if (file.exists())

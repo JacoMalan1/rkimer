@@ -9,13 +9,27 @@ enum class Move {
     R2, L2, U2, D2, B2, F2
 }
 
-data class Scramble(val moves: Array<Move>, val cubeType: CubeType = CubeType.c33) {
+data class Scramble(val moves: Array<Move>, val cubeType: CubeType = CubeType.C33) {
     companion object {
         fun fromJSONArray(json: JSONArray): Scramble {
             val moves: Array<Move> = Array(json.length()) { _ -> Move.R}
             for (i in 0 until json.length()) {
                 moves[i] = Move.values()[json.getInt(i)]
             }
+            return Scramble(moves)
+        }
+
+        fun fromString(str: String): Scramble {
+            val strMoves = str.split(" ")
+            val validMoves = ArrayList<String>()
+            Move.values().forEach { validMoves.add(it.toString()) }
+            val moves = Array(strMoves.size) { _ -> Move.R }
+
+            for (i in strMoves.indices) {
+                val ordinal = validMoves.indexOf(strMoves[i].replace('\'', 'p'))
+                moves[i] = Move.values()[ordinal]
+            }
+
             return Scramble(moves)
         }
     }
@@ -77,7 +91,7 @@ class ScrambleFactory {
                 }
             }
 
-            return Scramble(moves)
+            return Scramble(moves, cubeType = cubeType)
         }
     }
 }

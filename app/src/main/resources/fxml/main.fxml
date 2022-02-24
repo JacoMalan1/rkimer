@@ -7,7 +7,9 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.BorderPane?>
@@ -24,6 +26,11 @@
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="S" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator></MenuItem>
+                  <Menu mnemonicParsing="false" text="Import">
+                    <items>
+                      <MenuItem fx:id="mnuImportCsTimer" onAction="#mnuImportCsTimerClick" mnemonicParsing="false" text="csTimer Data" />
+                    </items>
+                  </Menu>
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="View">
@@ -34,6 +41,17 @@
                     </accelerator>
                 </MenuItem>
               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Cube">
+               <items>
+                  <RadioMenuItem fx:id="rmi3x3" mnemonicParsing="false" selected="true" text="3x3">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="tglCubeType" />
+                     </toggleGroup>
+                  </RadioMenuItem>
+                  <RadioMenuItem fx:id="rmi4x4" mnemonicParsing="false" text="4x4" toggleGroup="$tglCubeType" />
+                  <RadioMenuItem fx:id="rmi5x5" mnemonicParsing="false" text="5x5" toggleGroup="$tglCubeType" />
+               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Solve">
             <items>
