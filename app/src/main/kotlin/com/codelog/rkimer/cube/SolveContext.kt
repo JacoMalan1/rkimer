@@ -38,8 +38,8 @@ object SolveContext {
             val json = JSONObject(contents)
 
             for (ct in CubeType.values()) {
-                if (json.has(ct.toString())) {
-                    val jsonArray = json.getJSONArray(ct.toString())
+                if (json.has(ct.toString().lowercase())) {
+                    val jsonArray = json.getJSONArray(ct.toString().lowercase())
                     val solveList = ArrayList<Solve>()
 
                     for (i in 0 until jsonArray.length())
@@ -69,7 +69,7 @@ object SolveContext {
             for (solve in solveList) {
                 jsonArray.put(solve.serialize())
             }
-            json.put(ct.toString(), jsonArray)
+            json.put(ct.toString().lowercase(), jsonArray)
         }
 
         file.writeText(json.toString(4))

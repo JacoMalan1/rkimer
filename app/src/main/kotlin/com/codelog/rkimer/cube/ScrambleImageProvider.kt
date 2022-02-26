@@ -16,7 +16,7 @@ class ScrambleImageProvider(val scramble: Scramble, private val width: Double, p
      */
     override fun provide(): Image {
         val scrambleStr = scramble.toString().replace(" ", "")
-        val cubeTypeStr = (scramble.cubeType.ordinal + 3).toString()
+        val cubeTypeStr = (scramble.cubeType.cubeSize()).toString()
         val img = Image(
             Reference.SCRAMBLE_IMAGE_URL + "&pzl=$cubeTypeStr&alg=" + scrambleStr,
             width, height,

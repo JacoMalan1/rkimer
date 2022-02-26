@@ -126,14 +126,17 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
         isSaved = true
 
-        tglCubeType.selectedToggleProperty().addListener { _, oldValue, newValue ->
+        tglCubeType.selectedToggleProperty().addListener { _, _, newValue ->
+            val oldCubeType = cubeType
+
             val idxNew = tglCubeType.toggles.indexOf(newValue)
-            val idxOld = tglCubeType.toggles.indexOf(oldValue)
-            cubeType = CubeType.values()[idxNew]
+            for (ct in CubeType.values())
+                if (ct.cubeRank() == idxNew)
+                    cubeType = ct
+
             val cubeName = cubeType.cubeName()
             App.currentStage?.title = "RKimer - $cubeName"
 
-            val oldCubeType = CubeType.values()[idxOld]
             loadSolves(oldCubeType)
             resetTimer()
         }
@@ -164,7 +167,14 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun resetTimer() {
-        scramble = ScrambleFactory.generateScramble(20, cubeType)
+        val scrambleLength = when (cubeType) {
+            CubeType.C22 -> 11
+            CubeType.C33 -> 20
+            CubeType.C44 -> 40
+            CubeType.C55 -> 40
+            // else -> 20
+        }
+        scramble = ScrambleFactory.generateScramble(scrambleLength, cubeType)
         val imgProvider: ImageProvider = ScrambleImageProvider(scramble, 250.0, 250.0)
         imgScramble.image = imgProvider.provide()
 
