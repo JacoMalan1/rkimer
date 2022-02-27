@@ -1,12 +1,12 @@
 plugins {
     id 'application'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.31'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.10'
     id 'org.openjfx.javafxplugin' version '0.0.10'
 }
 
-sourceCompatibility = 16
-targetCompatibility = 16
+sourceCompatibility = 17
+targetCompatibility = 17
 
 group 'com.codelog'
 version '0.1.0-BETA'
@@ -23,7 +23,7 @@ repositories {
 }
 
 javafx {
-    version = '16'
+    version = '17'
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web' ]
 }
 
@@ -57,11 +57,11 @@ application {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = '16'
+    kotlinOptions.jvmTarget = '17'
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = '16'
+    kotlinOptions.jvmTarget = '17'
 }
 
 shadowJar {
