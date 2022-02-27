@@ -9,7 +9,7 @@ sourceCompatibility = 17
 targetCompatibility = 17
 
 group 'com.codelog'
-version '0.1.0-BETA'
+version '1.0.0-RC1'
 
 repositories {
     mavenCentral()
