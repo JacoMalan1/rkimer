@@ -38,7 +38,7 @@ class App: Application() {
         primaryStage.scene = scene
         primaryStage.icons.add(Image(javaClass.classLoader.getResourceAsStream("rkimer.ico")))
 
-        primaryStage.title = "RKimer"
+        primaryStage.title = "RKimer - 3x3"
         primaryStage.isResizable = false
 
         MainController.scene = scene

@@ -4,6 +4,7 @@ import com.codelog.rkimer.App
 import com.codelog.rkimer.cube.*
 import com.codelog.rkimer.util.AlertFactory
 import com.codelog.rkimer.util.ConfirmationDialogFactory
+import com.codelog.rkimer.util.TextInputDialogFactory
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -13,23 +14,28 @@ import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.*
 import javafx.scene.control.cell.TextFieldListCell
-import javafx.scene.image.Image
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
+import javafx.stage.FileChooser
+import javafx.stage.Modality
 import javafx.stage.Stage
 import javafx.util.StringConverter
-import org.json.JSONArray
-import java.io.File
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.IOException
 import java.net.URL
 import java.util.*
+import kotlin.math.floor
 import kotlin.math.round
 import kotlin.system.exitProcess
+import com.codelog.rkimer.util.KLoggerContext as Logger
 
 class MainController: Initializable, EventHandler<KeyEvent> {
+
     private var timer: Timer = Timer()
     private var time: Int = 0
+    private var cubeType = CubeType.C33
 
     companion object {
         var instance: MainController? = null
@@ -74,6 +80,8 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     lateinit var mnuPlusTwo: CheckMenuItem
     @FXML
     lateinit var imgScramble: ImageView
+    @FXML
+    lateinit var tglCubeType: ToggleGroup
 
     lateinit var scramble: Scramble
 
@@ -106,36 +114,52 @@ class MainController: Initializable, EventHandler<KeyEvent> {
             }
         }
 
-        loadSolves("solves.json")
+        val converted = SolveContext.loadSolves("solves.json")
+
+        loadSolves(CubeType.C33)
+
+        if (converted) {
+            AlertFactory.showAndWait("Your saved times have been converted from an old format (pre v0.1.0-BETA). " +
+                    "Should anything have gone wrong, please contact the developer. " +
+                    "Your old solves have been backed up as 'solves_backup.json'")
+            saveSolves()
+        }
+
+        isSaved = true
+
+        tglCubeType.selectedToggleProperty().addListener { _, _, newValue ->
+            val oldCubeType = cubeType
+
+            val idxNew = tglCubeType.toggles.indexOf(newValue)
+            for (ct in CubeType.values())
+                if (ct.cubeRank() == idxNew)
+                    cubeType = ct
+
+            val cubeName = cubeType.cubeName()
+            App.currentStage?.title = "RKimer - $cubeName"
+
+            loadSolves(oldCubeType)
+            resetTimer()
+        }
 
         lblTimer.text = "00:00.00"
         lblTimer.style = "-fx-font-family:'DSEG7 Modern'"
         txtStats.isDisable = true
         resetTimer()
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
         instance = this
     }
 
-    private fun loadSolves(filePath: String) {
-        val solves = ArrayList<Solve>()
-        val file = File(filePath)
-        if (file.exists()) {
-            val contents = file.readText()
-            val jsonArray = JSONArray(contents)
-            for (i in 0 until jsonArray.length()) {
-                val solve = Solve.fromJSONObject(jsonArray.getJSONObject(i))
-                solves.add(solve)
-            }
+    private fun loadSolves(oldCubeType: CubeType) {
+        if (lstSolves.items.size > 0)
+            SolveContext[oldCubeType] = ArrayList(lstSolves.items)
 
-            mnuPlusTwo.isSelected = solves.last().plusTwo
-            mnuDNF.isSelected = solves.last().dnf
+        lstSolves.items.clear()
 
-            lstSolves.items.addAll(solves)
-            if (lstSolves.items.size > 0)
-                lstSolves.selectionModel.select(0)
-        }
-
-        isSaved = true
+        lstSolves.items.addAll(SolveContext[cubeType])
+        if (lstSolves.items.size > 0)
+            lstSolves.selectionModel.select(0)
+        calculateStatistics(SolveContext[cubeType])
     }
 
     fun tickTimer() {
@@ -144,7 +168,14 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     }
 
     private fun resetTimer() {
-        scramble = ScrambleFactory.generateScramble(20)
+        val scrambleLength = when (cubeType) {
+            CubeType.C22 -> 11
+            CubeType.C33 -> 20
+            CubeType.C44 -> 40
+            CubeType.C55 -> 40
+            // else -> 20
+        }
+        scramble = ScrambleFactory.generateScramble(scrambleLength, cubeType)
         val imgProvider: ImageProvider = ScrambleImageProvider(scramble, 250.0, 250.0)
         imgScramble.image = imgProvider.provide()
 
@@ -154,15 +185,21 @@ class MainController: Initializable, EventHandler<KeyEvent> {
     private fun registerSolve() {
         lstSolves.items.add(0, Solve(time, dnf = false, plusTwo = false, scramble = scramble))
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
-    private fun calculateStatistics() {
-        if (lstSolves.items.size == 0)
+    private fun calculateStatistics(solveList: List<Solve>) {
+        if (solveList.isEmpty()) {
+            val builder = StringBuilder()
+            builder.append("Best: N/A\n")
+            builder.append("Mean of 3: N/A\n")
+            builder.append("Average of 5: N/A")
+            txtStats.text = builder.toString()
             return
+        }
 
         val solves = ArrayList<Solve>()
-        solves.addAll(lstSolves.items)
+        solves.addAll(solveList)
         solves.removeIf { it.dnf }
 
         if (solves.size == 0)
@@ -223,6 +260,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
 
     private fun toggleTimer() {
         if (!isTimerRunning) {
+            lblTimer.style = "-fx-font-family:'DSEG7 Modern';-fx-text-fill: green;"
             instance?.timer = Timer()
             instance?.time = 0
             instance?.timer?.scheduleAtFixedRate(object : TimerTask() {
@@ -236,6 +274,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         } else {
             instance?.timer?.cancel()
             isTimerRunning = false
+            lblTimer.style = "-fx-font-family:'DSEG7 Modern';-fx-text-fill: black;"
             resetTimer()
             registerSolve()
         }
@@ -245,6 +284,10 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         if (event.code == KeyCode.SPACE) {
             toggleTimer()
         }
+        if (event.code == KeyCode.RIGHT) {
+            val idx = tglCubeType.toggles.indexOf(tglCubeType.selectedToggle)
+            tglCubeType.toggles[(idx + 1) % tglCubeType.toggles.size].isSelected = true
+        }
     }
 
     fun mnuDNFClick() {
@@ -252,7 +295,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         lstSolves.refresh()
         mnuPlusTwo.isDisable = mnuDNF.isSelected
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
     fun mnuPlusTwoClick() {
@@ -260,17 +303,12 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         lstSolves.refresh()
         mnuDNF.isDisable = mnuPlusTwo.isSelected
         isSaved = false
-        calculateStatistics()
+        calculateStatistics(lstSolves.items)
     }
 
     private fun saveSolves() {
-        val solveArray = JSONArray()
-        for (solve in lstSolves.items)
-            solveArray.put(solve.serialize())
-        val file = File("solves.json")
-        if (file.exists())
-            file.delete()
-        file.writeText(solveArray.toString(4))
+        SolveContext[cubeType] = ArrayList(lstSolves.items)
+        SolveContext.writeSolves("solves.json")
         isSaved = true
     }
 
@@ -299,7 +337,7 @@ class MainController: Initializable, EventHandler<KeyEvent> {
                 if (result.get()) {
                     lstSolves.items.remove(lstSolves.selectionModel.selectedItem)
                     lstSolves.refresh()
-                    calculateStatistics()
+                    calculateStatistics(lstSolves.items)
                 }
             }
         }
@@ -317,5 +355,65 @@ class MainController: Initializable, EventHandler<KeyEvent> {
         SolveDataController.instance?.addSolves()
 
         stage.showAndWait()
+    }
+
+    fun mnuImportCsTimerClick() {
+        val stage = Stage()
+        stage.initOwner(App.currentStage)
+        stage.initModality(Modality.APPLICATION_MODAL)
+
+        val fileChooser = FileChooser()
+        fileChooser.title = "Open csTimer data"
+        val file = fileChooser.showOpenDialog(stage)
+
+        val contents = file.readText()
+        try {
+            val json = JSONObject(contents)
+            val solves = ArrayList<Solve>()
+            for (key in json.keySet()) {
+                if (key.contains("session")) {
+                    val jsonArray = json.getJSONArray(key)
+                    for (i in 0 until jsonArray.length()) {
+                        val jsonSolve = jsonArray.getJSONArray(i)
+                        val flag = jsonSolve.getJSONArray(0).getInt(0)
+                        var dnf = false
+                        var plusTwo = false
+                        if (flag == 2000)
+                            plusTwo = true
+                        else if (flag == -1)
+                            dnf = true
+
+                        val time = floor(jsonSolve.getJSONArray(0).getInt(1) / 10.toDouble()).toInt()
+                        val scrambleStr = jsonSolve.getString(1)
+                        val scramble = Scramble.fromString(scrambleStr)
+
+                        solves.add(Solve(time, dnf, plusTwo, scramble))
+                    }
+                }
+            }
+            lstSolves.items.addAll(0, solves)
+            isSaved = false
+        } catch (e: JSONException) {
+            Logger.error("Couldn't load file (${file.absolutePath})")
+            Logger.exception(e)
+            AlertFactory.showAlert("The file you selected does not contain valid JSON!", Alert.AlertType.ERROR)
+        }
+    }
+
+    fun mnuEnterManuallyClick() {
+        val dialog = TextInputDialogFactory.makeTextBoxDialog()
+        val input = dialog.showAndWait()
+
+        if (input.isPresent) {
+            val valid = input.get().matches("\\d\\d:\\d\\d\\.\\d\\d".toRegex())
+            if (!valid) {
+                AlertFactory.showAndWait("Invalid time string!", Alert.AlertType.ERROR)
+                mnuEnterManuallyClick()
+                return
+            }
+
+            time = strToTime(input.get())
+            registerSolve()
+        }
     }
 }

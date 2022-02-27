@@ -6,16 +6,36 @@ import kotlin.random.Random
 enum class Move {
     R, L, U, D, B, F,
     Rp, Lp, Up, Dp, Bp, Fp,
-    R2, L2, U2, D2, B2, F2
+    R2, L2, U2, D2, B2, F2,
+
+    r, l, u, d, b, f,
+    rp, lp, up, dp, bp, fp,
+    r2, l2, u2, d2, b2, f2
 }
 
-data class Scramble(val moves: Array<Move>) {
+
+
+data class Scramble(val moves: Array<Move>, val cubeType: CubeType = CubeType.C33) {
     companion object {
         fun fromJSONArray(json: JSONArray): Scramble {
             val moves: Array<Move> = Array(json.length()) { _ -> Move.R}
             for (i in 0 until json.length()) {
                 moves[i] = Move.values()[json.getInt(i)]
             }
+            return Scramble(moves)
+        }
+
+        fun fromString(str: String): Scramble {
+            val strMoves = str.split(" ")
+            val validMoves = ArrayList<String>()
+            Move.values().forEach { validMoves.add(it.toString()) }
+            val moves = Array(strMoves.size) { _ -> Move.R }
+
+            for (i in strMoves.indices) {
+                val ordinal = validMoves.indexOf(strMoves[i].replace('\'', 'p'))
+                moves[i] = Move.values()[ordinal]
+            }
+
             return Scramble(moves)
         }
     }
@@ -56,18 +76,28 @@ data class Scramble(val moves: Array<Move>) {
 
 class ScrambleFactory {
     companion object {
-        fun generateScramble(length: Int): Scramble {
+        fun generateScramble(length: Int, cubeType: CubeType): Scramble {
+            val allowedRange = when (cubeType) {
+                CubeType.C22 -> Move.F2.ordinal
+                CubeType.C33 -> Move.F2.ordinal
+                CubeType.C44 -> Move.f2.ordinal
+                CubeType.C55 -> Move.f2.ordinal
+            } + 1
+            val allowedMoves = Move.values().asList().subList(0, allowedRange)
+
             val moves = Array(length) { _ -> Move.R }
+
             val rand = Random(System.nanoTime())
 
-            val validMoves: MutableList<Move> = ArrayList()
-            validMoves.addAll(Move.values())
+            val validMoves
+                    : MutableList<Move> = ArrayList()
+            validMoves.addAll(allowedMoves)
             for (i in 0 until length) {
                 val selectedMove = validMoves[rand.nextInt(0, validMoves.size)]
                 moves[i] = selectedMove
 
                 validMoves.clear()
-                for (move in Move.values()) {
+                for (move in allowedMoves) {
                     if (move.ordinal % 6 != selectedMove.ordinal % 6) {
                         val invalidMove = if (selectedMove.ordinal % 2 == 0)
                             selectedMove.ordinal + 1 else selectedMove.ordinal - 1
@@ -77,7 +107,7 @@ class ScrambleFactory {
                 }
             }
 
-            return Scramble(moves)
+            return Scramble(moves, cubeType = cubeType)
         }
     }
 }
