@@ -20,6 +20,24 @@ fun timeToStr(time: Int): String {
     return "$minutesStr:$secondsStr.$millisStr"
 }
 
+fun strToTime(str: String): Int {
+    if (!str.matches("\\d\\d:\\d\\d\\.\\d\\d".toRegex()))
+        return -1
+
+    val colon = str.indexOf(':')
+    val point = str.indexOf('.')
+
+
+    val mm = str.substring(0, colon).toIntOrNull()
+    val ss = str.substring(colon + 1, point).toIntOrNull()
+    val ms = str.substring(point + 1).toIntOrNull()
+
+    if (mm == null || ss == null || ms == null)
+        return -1
+
+    return (mm * 60 + ss) * 100 + ms
+}
+
 data class Solve(val time: Int, var dnf: Boolean, var plusTwo: Boolean, val scramble: Scramble? = null,
                  val cubeType: CubeType = CubeType.C33) {
 

@@ -4,6 +4,7 @@ import com.codelog.rkimer.App
 import com.codelog.rkimer.cube.*
 import com.codelog.rkimer.util.AlertFactory
 import com.codelog.rkimer.util.ConfirmationDialogFactory
+import com.codelog.rkimer.util.TextInputDialogFactory
 import javafx.application.Platform
 import javafx.event.EventHandler
 import javafx.fxml.FXML
@@ -396,6 +397,23 @@ class MainController: Initializable, EventHandler<KeyEvent> {
             Logger.error("Couldn't load file (${file.absolutePath})")
             Logger.exception(e)
             AlertFactory.showAlert("The file you selected does not contain valid JSON!", Alert.AlertType.ERROR)
+        }
+    }
+
+    fun mnuEnterManuallyClick() {
+        val dialog = TextInputDialogFactory.makeTextBoxDialog()
+        val input = dialog.showAndWait()
+
+        if (input.isPresent) {
+            val valid = input.get().matches("\\d\\d:\\d\\d\\.\\d\\d".toRegex())
+            if (!valid) {
+                AlertFactory.showAndWait("Invalid time string!", Alert.AlertType.ERROR)
+                mnuEnterManuallyClick()
+                return
+            }
+
+            time = strToTime(input.get())
+            registerSolve()
         }
     }
 }

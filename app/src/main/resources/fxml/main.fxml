@@ -71,6 +71,11 @@
                           <KeyCodeCombination alt="UP" code="DELETE" control="UP" meta="UP" shift="UP" shortcut="UP" />
                       </accelerator>
                   </MenuItem>
+                  <MenuItem fx:id="mnuEnterManually" mnemonicParsing="false" onAction="#mnuEnterManuallyClick" text="Enter Manually">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="m" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
             </items>
           </Menu>
         </menus>
