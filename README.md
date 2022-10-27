@@ -8,7 +8,7 @@ to submit a pull request. (See [Contributing](CONTRIBUTING.md))
 
 ## Building
 - Run the Gradle wrapper with the artifact you want to produce. 
-(e.g. `./gradlew shadowJar` produces the full executable jar file)
+(e.g. `./gradlew fatJar` produces the full executable jar file)
 
 ## Copyright
 
