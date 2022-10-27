@@ -7,15 +7,6 @@ Right now, it's in the early stages of development and any contributors are welc
 to submit a pull request. (See [Contributing](CONTRIBUTING.md))
 
 ## Building
-
-- Create a new file in the root of the project called `gradle.properties` 
-with your github username (lowercase) and personal authentication token (see the
-[GitHub Documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)).
-Example `gradle.properties` file:
-```
-gpr.user=<userame>
-gpr.token=<token>
-```
 - Run the Gradle wrapper with the artifact you want to produce. 
 (e.g. `./gradlew shadowJar` produces the full executable jar file)
 
